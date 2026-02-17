@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+dist/
+build/
+coverage/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Prisma
+server/prisma/*.db
+server/prisma/*.db-journal
+
+# Test
+.nyc_output/
+playwright-report/
+test-results/
+cookies.txt
+
+# Vite
+client/.vite/
+
+# Misc
+*.tsbuildinfo
