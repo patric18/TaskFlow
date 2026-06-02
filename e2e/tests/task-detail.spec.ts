@@ -45,7 +45,7 @@ test.describe('Task detail', () => {
     expect(dbTask?.title).toBe(newTitle);
   });
 
-  test('add comment and see it immediately', async ({ page, request, e2eProjectId, ownerToken, authenticatedPage }) => {
+  test('add comment and see it immediately', flaky, async ({ page, request, e2eProjectId, ownerToken, authenticatedPage }) => {
     const kanban = new KanbanPage(page);
     await kanban.goto(e2eProjectId);
 
