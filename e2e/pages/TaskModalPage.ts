@@ -16,7 +16,7 @@ export class TaskModalPage {
   }
 
   closeButton() {
-    return this.dialog().getByRole('button', { name: 'Close' });
+    return this.dialog().locator('.border-t').getByRole('button', { name: 'Close' });
   }
 
   commentInput() {
@@ -37,7 +37,11 @@ export class TaskModalPage {
 
   async addComment(content: string) {
     await this.commentInput().fill(content);
+    const createComment = this.page.waitForResponse(
+      (res) => res.url().includes('/comments') && res.request().method() === 'POST',
+    );
     await this.postCommentButton().click();
+    await createComment;
   }
 
   async close() {

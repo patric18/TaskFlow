@@ -44,7 +44,7 @@ export default function BillingSettingsPage() {
 
   const handleUpgrade = async () => {
     try {
-      if (devBillingAvailable && !stripeConfigured) {
+      if (devBillingAvailable) {
         await devUpgrade();
         toast.success('Pro plan activated (dev mode)');
         refreshOrganizations();
@@ -59,7 +59,7 @@ export default function BillingSettingsPage() {
 
   const handleManage = async () => {
     try {
-      if (devBillingAvailable && !stripeConfigured) {
+      if (devBillingAvailable) {
         await devDowngrade();
         toast.success('Downgraded to Free (dev mode)');
         refreshOrganizations();
@@ -173,9 +173,7 @@ export default function BillingSettingsPage() {
                       disabled={!stripeConfigured && !devBillingAvailable}
                       onClick={handleUpgrade}
                     >
-                      {devBillingAvailable && !stripeConfigured
-                        ? 'Activate Pro (dev)'
-                        : 'Upgrade to Pro'}
+                      {devBillingAvailable ? 'Activate Pro (dev)' : 'Upgrade to Pro'}
                     </Button>
                   )}
 
@@ -187,9 +185,7 @@ export default function BillingSettingsPage() {
                       disabled={!stripeConfigured && !devBillingAvailable}
                       onClick={handleManage}
                     >
-                      {devBillingAvailable && !stripeConfigured
-                        ? 'Downgrade to Free (dev)'
-                        : 'Manage subscription'}
+                      {devBillingAvailable ? 'Downgrade to Free (dev)' : 'Manage subscription'}
                     </Button>
                   )}
 

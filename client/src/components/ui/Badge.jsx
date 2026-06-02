@@ -22,6 +22,8 @@ export function Badge({ children, color = 'gray', className }) {
   );
 }
 
+// Shared with TaskCard; kept here to avoid an extra module for a small constant map.
+// eslint-disable-next-line react-refresh/only-export-components
 export const PRIORITY_BADGE = {
   LOW: { label: 'Low', color: 'gray' },
   MEDIUM: { label: 'Medium', color: 'blue' },

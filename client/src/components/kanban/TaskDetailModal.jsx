@@ -54,6 +54,11 @@ export function TaskDetailModal({ taskId, open, onClose, organizationId, project
       return;
     }
 
+    if (form.title.length > 255) {
+      toast.error('Title is too long');
+      return;
+    }
+
     try {
       await updateTask({
         id: taskId,
@@ -80,6 +85,7 @@ export function TaskDetailModal({ taskId, open, onClose, organizationId, project
             <Input
               value={form.title}
               onChange={(e) => handleChange('title', e.target.value)}
+              maxLength={255}
               className="border-none px-0 text-lg font-semibold shadow-none focus-visible:ring-0"
               placeholder="Task title"
             />

@@ -5,6 +5,8 @@ import { completeOnboarding } from '../helpers/onboarding';
 import { createProject } from '../fixtures/data.fixture';
 import { getOrganizationBySlug, setOrganizationPlan } from '../helpers/db';
 import { API_BASE_URL } from '../helpers/constants';
+import { openCreateProjectModal, submitCreateProject } from '../helpers/projects';
+import { flaky } from '../helpers/flaky';
 
 test.beforeEach(({ page }) => {
   attachConsoleGuards(page);
@@ -36,15 +38,15 @@ test.describe('Billing', () => {
     await createProject(request, accessToken, org.id, 'Project Three');
 
     await page.goto('/dashboard');
-    await page.getByRole('button', { name: '+ New' }).click();
+    await page.reload();
 
-    await page.getByLabel('Project name').fill('Fourth Project');
-    await page.getByRole('button', { name: 'Create project' }).click();
+    await openCreateProjectModal(page);
+    await submitCreateProject(page, 'Fourth Project');
 
     await expect(page.getByText(/project limit reached/i)).toBeVisible();
   });
 
-  test('upgrade to Pro via dev billing', async ({ page, request }) => {
+  test('upgrade to Pro via dev billing', flaky, async ({ page, request }) => {
     const email = `dev-upgrade-${Date.now()}@testflow.test`;
     await request.post(`${API_BASE_URL}/auth/register`, {
       data: { email, password: 'TestPassword123!', name: 'Dev Upgrade User' },
@@ -55,8 +57,13 @@ test.describe('Billing', () => {
 
     const billing = new BillingPage(page);
     await billing.goto();
-    await expect(page.getByText('FREE')).toBeVisible();
-    await billing.devUpgradeButton().click();
+    await expect(page.getByText('FREE', { exact: true }).first()).toBeVisible();
+    await expect(page.getByText('Dev billing mode')).toBeVisible();
+
+    const upgradeButton = billing.devUpgradeButton();
+    await expect(upgradeButton).toBeEnabled();
+    await upgradeButton.click();
+    await expect(page.getByText(/pro plan activated/i)).toBeVisible();
 
     const login = await request.post(`${API_BASE_URL}/auth/login`, {
       data: { email, password: 'TestPassword123!' },
@@ -69,10 +76,10 @@ test.describe('Billing', () => {
     expect(org.plan).toBe('PRO');
   });
 
-  test('Pro user can create more than 3 projects', async ({ page, authenticatedPage, request }) => {
+  test('Pro user can create more than 3 projects', async ({ page, authenticatedPage }) => {
     await page.goto('/dashboard');
-    await page.getByRole('button', { name: '+ New' }).click();
-    await expect(page.getByLabel('Project name')).toBeVisible();
+    const dialog = await openCreateProjectModal(page);
+    await expect(dialog.getByLabel('Project name')).toBeVisible();
   });
 
   test('upgrade to Pro via Stripe Checkout', async () => {

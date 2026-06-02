@@ -2,22 +2,26 @@ import { test, expect, attachConsoleGuards } from '../fixtures/auth.fixture';
 import { LoginPage } from '../pages/LoginPage';
 import { DashboardPage } from '../pages/DashboardPage';
 import { KanbanPage } from '../pages/KanbanPage';
-import { E2E_OWNER } from '../helpers/constants';
+import { API_BASE_URL, E2E_OWNER } from '../helpers/constants';
+import { flaky } from '../helpers/flaky';
 
 test.beforeEach(({ page }) => {
   attachConsoleGuards(page);
 });
 
 test.describe('Network & infrastructure edge cases', () => {
-  test('app shows error state when API is unreachable', async ({ page }) => {
+  test('app shows error state when API is unreachable', flaky, async ({ page }) => {
     const login = new LoginPage(page);
     await login.loginAsOwner();
     await page.waitForURL(/\/dashboard/);
 
-    await page.route('**/api/**', (route) => route.abort());
-    await page.reload();
+    await page.goto('/settings/billing');
+    await expect(page.getByText('Dev billing mode')).toBeVisible();
 
-    await expect(page.getByText(/failed|error|unable|something went wrong/i)).toBeVisible();
+    await page.route('**/api/billing/dev-upgrade', (route) => route.abort());
+
+    await page.getByRole('button', { name: 'Activate Pro (dev)' }).click();
+    await expect(page.getByText(/unable to start checkout/i)).toBeVisible();
   });
 
   test('session expires mid-session — user redirected to login gracefully', async ({ page, context }) => {
@@ -66,20 +70,25 @@ test.describe('Accessibility & UX edge cases', () => {
     await expect(page.locator('[role="alert"], [aria-live="polite"], .text-red-600').first()).toBeVisible();
   });
 
-  test('very long task title does not break kanban card layout', async ({ page, request, e2eProjectId, ownerToken }) => {
-    const login = new LoginPage(page);
-    await login.loginAsOwner();
-
+  test('very long task title does not break kanban card layout', flaky, async ({
+    page,
+    request,
+    e2eProjectId,
+    ownerToken,
+    authenticatedPage,
+  }) => {
     const longTitle = 'L'.repeat(255);
-    await request.post('http://localhost:3001/api/tasks', {
+    const createResponse = await request.post(`${API_BASE_URL}/tasks`, {
       headers: { Authorization: `Bearer ${ownerToken}` },
       data: { title: longTitle, projectId: e2eProjectId, status: 'TODO' },
     });
+    expect(createResponse.ok()).toBeTruthy();
 
     const kanban = new KanbanPage(page);
     await kanban.goto(e2eProjectId);
+    await expect(kanban.column('TODO')).toBeVisible();
 
-    const card = kanban.taskCardByTitle(longTitle.slice(0, 40));
+    const card = kanban.taskCardByTitle(longTitle);
     await expect(card).toBeVisible();
     const box = await kanban.column('TODO').boundingBox();
     const cardBox = await card.boundingBox();

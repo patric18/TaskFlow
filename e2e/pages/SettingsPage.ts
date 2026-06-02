@@ -20,11 +20,19 @@ export class SettingsPage {
     await this.page.getByRole('heading', { name: 'Invite team member' }).waitFor();
   }
 
+  inviteDialog() {
+    return this.page.getByRole('dialog', { name: 'Invite team member' });
+  }
+
+  inviteEmailInput() {
+    return this.inviteDialog().getByLabel('Email address');
+  }
+
   async inviteMember(email: string, role: 'MEMBER' | 'ADMIN' = 'MEMBER') {
     await this.openInviteModal();
-    await this.page.getByLabel('Email address').fill(email);
-    await this.page.locator('select').last().selectOption(role);
-    await this.page.getByRole('button', { name: 'Send invite' }).click();
+    await this.inviteEmailInput().fill(email);
+    await this.inviteDialog().locator('select').selectOption(role);
+    await this.inviteDialog().getByRole('button', { name: 'Send invite' }).click();
   }
 
   memberRow(email: string) {

@@ -3,11 +3,7 @@ import { env } from '../config/env.js';
 import { AppError } from '../utils/errors.js';
 import { sendMemberInviteEmail } from '../utils/email.js';
 import { assertCanAddMember } from './planService.js';
-import {
-  getMembership,
-  requireOrgAdmin,
-  requireOrgMembership,
-} from './organizationService.js';
+import { requireOrgAdmin } from './organizationService.js';
 
 export async function inviteOrganizationMember(actorId, organizationId, { email, role = 'MEMBER' }) {
   const actorMembership = await requireOrgAdmin(actorId, organizationId);

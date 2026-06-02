@@ -40,7 +40,7 @@ export function TaskCard({ task, onClick }) {
       )}
       data-testid={`task-card-${task.id}`}
     >
-      <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{task.title}</p>
+      <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">{task.title}</p>
 
       <div className="mt-3 flex items-center justify-between gap-2">
         <Badge color={priority.color}>{priority.label}</Badge>
@@ -59,7 +59,7 @@ export function TaskCardOverlay({ task }) {
 
   return (
     <div className="rotate-2 rounded-lg border border-brand-300 bg-white p-3 shadow-lg dark:border-brand-700 dark:bg-gray-900">
-      <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{task.title}</p>
+      <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">{task.title}</p>
       <div className="mt-3">
         <Badge color={priority.color}>{priority.label}</Badge>
       </div>

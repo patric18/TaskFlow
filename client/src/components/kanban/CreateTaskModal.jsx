@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Modal } from '../ui/Modal.jsx';
 import { Input } from '../ui/Input.jsx';
 import { Button } from '../ui/Button.jsx';
@@ -10,6 +10,7 @@ export function CreateTaskModal({ open, onClose, onSubmit, loading, defaultStatu
   const [title, setTitle] = useState('');
   const [priority, setPriority] = useState('MEDIUM');
   const [error, setError] = useState('');
+  const submittingRef = useRef(false);
 
   const columnTitle = KANBAN_COLUMNS.find((column) => column.id === defaultStatus)?.title;
 
@@ -21,6 +22,11 @@ export function CreateTaskModal({ open, onClose, onSubmit, loading, defaultStatu
       return;
     }
 
+    if (submittingRef.current || loading) {
+      return;
+    }
+
+    submittingRef.current = true;
     setError('');
 
     try {
@@ -30,6 +36,8 @@ export function CreateTaskModal({ open, onClose, onSubmit, loading, defaultStatu
       onClose();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create task');
+    } finally {
+      submittingRef.current = false;
     }
   };
 

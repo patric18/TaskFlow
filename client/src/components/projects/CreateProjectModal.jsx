@@ -54,6 +54,7 @@ export function CreateProjectModal({ open, onClose, onSubmit, loading }) {
         )}
 
         <Input
+          id="project-name"
           label="Project name"
           value={name}
           onChange={(e) => setName(e.target.value)}

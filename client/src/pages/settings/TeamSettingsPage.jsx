@@ -176,6 +176,7 @@ export default function TeamSettingsPage() {
           )}
 
           <Input
+            id="invite-email"
             label="Email address"
             type="email"
             value={email}
