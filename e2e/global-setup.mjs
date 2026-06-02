@@ -24,6 +24,12 @@ export default async function globalSetup() {
     );
   }
 
+  execSync('npx prisma generate', {
+    cwd: path.join(rootDir, 'server'),
+    stdio: 'inherit',
+    env: process.env,
+  });
+
   execSync('npx prisma migrate deploy', {
     cwd: path.join(rootDir, 'server'),
     stdio: 'inherit',
